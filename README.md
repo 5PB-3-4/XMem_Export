@@ -33,7 +33,7 @@ git clone https://github.com/5PB-3-4/XMem_Export.git
 <br>
 
 ### Check Dependency Library
-I recommend install using XMem's [requirement.txt](https://github.com/hkchengrex/XMem/blob/main/requirements.txt)
+It is recommended to install using XMem's [requirement.txt](https://github.com/hkchengrex/XMem/blob/main/requirements.txt) file.
 
 <br>
 

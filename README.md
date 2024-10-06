@@ -30,14 +30,19 @@ sample mask file: ```test-sample1-1frame-mask.png``` is made by [EfficientSAM](h
 ```shell
 git clone https://github.com/5PB-3-4/XMem_Export.git
 ```
+<br>
 
 ### Check Dependency Library
 I recommend install using XMem's [requirement.txt](https://github.com/hkchengrex/XMem/blob/main/requirements.txt)
+
+<br>
 
 ### Download XMem checkpoint file
 Original pretrained model is [here](https://github.com/hkchengrex/XMem/releases/tag/v1.0).
 
 > Tested XMem-s012.pth, XMem-s012.pth
+
+<br>
 
 ### Run export
 ```shell

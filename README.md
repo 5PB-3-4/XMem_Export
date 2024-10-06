@@ -4,7 +4,7 @@
 > This repogitory is work in progress.
 
 ## ▼ What's this?
-This repository converts the XMem tracker model included in Track-Anything from PyTorch to ONNX.
+This repository converts the XMem tracker model included in [Track-Anything](https://github.com/gaomingqi/Track-Anything/tree/master/tracker) from PyTorch to ONNX.
 
 <br>
 

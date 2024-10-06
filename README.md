@@ -40,7 +40,7 @@ It is recommended to install using XMem's [requirement.txt](https://github.com/h
 ### Download XMem checkpoint file
 Original pretrained model is [here](https://github.com/hkchengrex/XMem/releases/tag/v1.0).
 
-> Tested XMem-s012.pth, XMem-s012.pth
+> Tested XMem-s012.pth, XMem-with-mose.pth
 
 <br>
 

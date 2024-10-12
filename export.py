@@ -8,13 +8,12 @@ from base_tracker import BaseTracker
 from export_model import *
 
 
-parser = argparse.ArgumentParser(description='welcome to Xmem exporter v0.1')
+parser = argparse.ArgumentParser(description='welcome to Xmem exporter v0.2')
 parser.add_argument('-i', '--input_dir', required=True, help='Xmem checkpoint file path')
 parser.add_argument('-o', '--output_dir', required=False, default='./export/', help='export folder path. default is [ export/ ]')
-parser.add_argument('--width', required=False, default=640, help='image file width. default is [ 640 ] ')
-parser.add_argument('--height', required=False, default=360, help='image file height. default is [ 360 ] ')
-parser.add_argument('--name', required=False, default='', help='you can set export model name.example: [ Xmem-decode-???.onnx ]  (??? is your set name)')
-parser.add_argument('--mask_num', required=False, default=5, help='max number of mask. default is [ 5 ] ')
+parser.add_argument('--width', required=False, default=640, help='model input width. default is [ 640 ] ')
+parser.add_argument('--height', required=False, default=480, help='model input height. default is [ 480 ] ')
+parser.add_argument('--mask_num', required=False, default=1, help='the number of mask. default is [ 1 ] ')
 args = parser.parse_args()
 print()
 
@@ -22,7 +21,6 @@ print()
 print("=================================================================================")
 print('initialize model')
 print("=================================================================================")
-model_name_type = args.name
 xmem_checkpoint = args.input_dir
 device = "cpu"
 Btrack = BaseTracker(xmem_checkpoint, device)
@@ -106,12 +104,21 @@ if do_export_flag["encode_key"]:
     torch.onnx.export(
         model_encode_key,
         dummy_inputs,
-        "./export/XMem-encode_key-{}.onnx".format(model_name_type),
+        "./export/XMem-encode_key.onnx",
         export_params=True,
         opset_version=17,
         do_constant_folding=False,
         input_names= ["image", "need_sk", "need_ek"],
         output_names=["key", "shrinkage", "selection", "f16", "f8", "f4"],
+        dynamic_axes={
+            "image"    : { 2: "h",  3: "w" },
+            "key"      : { 2: "x",  3: "y" },
+            "shrinkage": { 2: "x",  3: "y" },
+            "selection": { 2: "x",  3: "y" },
+            "f16"      : { 2: "x",  3: "y" },
+            "f8"       : { 2: "x2", 3: "y2"},
+            "f4"       : { 2: "x4", 3: "y4"}
+        },
         verbose=False
     )
 
@@ -138,7 +145,7 @@ if do_export_flag["encode_value"]:
     torch.onnx.export(
         model_encode_value,
         dummy_inputs,
-        "./export/XMem-encode_value-{}.onnx".format(model_name_type),
+        f"./export/XMem-encode_value-m{mask_num}.onnx",
         export_params=True,
         opset_version=11,
         do_constant_folding=True,
@@ -169,7 +176,7 @@ if do_export_flag["decode"]:
     torch.onnx.export(
         model_segment,
         dummy_inputs,
-        "./export/XMem-decode-{}.onnx".format(model_name_type),
+        f"./export/XMem-decode-m{mask_num}.onnx",
         export_params=True,
         opset_version=11,
         do_constant_folding=False,

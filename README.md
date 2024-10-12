@@ -26,7 +26,7 @@ sample mask file: ```test-sample1-1frame-mask.png``` is made by [EfficientSAM](h
 
 
 ## ▼ Get Started
-### Get code
+### Get Code
 ```shell
 git clone https://github.com/5PB-3-4/XMem_Export.git
 ```
@@ -37,14 +37,14 @@ It is recommended to install using XMem's [requirement.txt](https://github.com/h
 
 <br>
 
-### Download XMem checkpoint file
+### Download XMem Checkpoint File
 Original pretrained model is [here](https://github.com/hkchengrex/XMem/releases/tag/v1.0).
 
 > Tested XMem-s012.pth, XMem-with-mose.pth
 
 <br>
 
-### Run export
+### Run Export
 ```shell
 # Run
 cd XMem_Export

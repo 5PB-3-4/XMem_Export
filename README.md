@@ -46,6 +46,7 @@ Original pretrained model is [here](https://github.com/hkchengrex/XMem/releases/
 
 ### Run export
 ```shell
+cd XMem_Export
 python export.py -i ./ckpt/XMem-s012.pth --name s012 --width 360 --height 240 --mask_num 1
 ```
 

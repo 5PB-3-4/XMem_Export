@@ -46,13 +46,13 @@ Original pretrained model is [here](https://github.com/hkchengrex/XMem/releases/
 
 ### Run export
 ```shell
+# Run
 cd XMem_Export
 python export.py -i ./ckpt/XMem-s012.pth --width 640 --height 480 --mask_num 1
+
+# Parser option
+python export.py -h
 ```
-
-Parser option ->
-``` python export.py -h ```
-
 
 <br><br>
 

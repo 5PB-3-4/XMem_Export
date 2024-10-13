@@ -8,7 +8,7 @@ from base_tracker import BaseTracker
 from export_model import *
 
 
-parser = argparse.ArgumentParser(description='welcome to Xmem exporter v0.2')
+parser = argparse.ArgumentParser(description='welcome to Xmem exporter v0.3')
 parser.add_argument('-i', '--input_dir', required=True, help='Xmem checkpoint file path')
 parser.add_argument('-o', '--output_dir', required=False, default='./export/', help='export folder path. default is [ export/ ]')
 parser.add_argument('--width', required=False, default=640, help='model input width. default is [ 640 ] ')

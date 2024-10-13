@@ -1,0 +1,5 @@
+opencv-contrib-python
+pillow
+progressbar2
+onnx==1.16.0
+numpy==1.26.4

@@ -35,20 +35,9 @@ class EncodeValue(nn.Module):
         self.enc = encoder
         self.is_hidden_dim = torch.tensor([encoder.hidden_reinforce is not None]).type(torch.bool)
 
-    def forward(self, image, image_feat_f16, h, masks, is_deep_update:torch.Tensor):
+    def forward(self, image, image_feat_f16, h, masks, others, is_deep_update:torch.Tensor):
         # image_feat_f16 is the feature from the key encoder
 
-        num_objects = masks.shape[1]
-        others = torch.where(
-            torch.tensor([num_objects==1]).type(torch.bool),
-            torch.zeros_like(masks),
-            torch.cat([
-                torch.sum(
-                    masks[:, [j for j in range(num_objects) if i!=j]]
-                , dim=1, keepdim=True)
-            for i in range(num_objects)], 1)
-            ) 
-        
         g = torch.zeros_like(masks)
         if not self.enc.single_object:
             g = torch.stack([masks, others], 2)

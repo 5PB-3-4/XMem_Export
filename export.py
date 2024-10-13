@@ -90,7 +90,7 @@ print("model: key encoder + key projection")
 model_encode_key = EncodeKey(
     Btrack.tracker.network.key_encoder,
     Btrack.tracker.network.key_proj
-).eval().cpu()
+    ).eval().cpu()
 
 if do_export_flag["encode_key"]:
     print("\nexport\n")
@@ -139,6 +139,7 @@ if do_export_flag["encode_value"]:
         torch.randn((1, 1024, h_div16, w_div16)),
         torch.randn((1, mask_num, hidden_dim, h_div16, w_div16)),
         torch.randn((1, mask_num, h_new, w_new)),
+        torch.randn((1, mask_num, h_new, w_new)),
         torch.randn((1))
     )
 
@@ -147,9 +148,9 @@ if do_export_flag["encode_value"]:
         dummy_inputs,
         f"./export/XMem-encode_value-m{mask_num}.onnx",
         export_params=True,
-        opset_version=11,
+        opset_version=17,
         do_constant_folding=True,
-        input_names= ["image","f16", "h16_in", "masks", "is_deep_update"],
+        input_names= ["image","f16", "h16_in", "masks", "others", "is_deep_update"],
         output_names=["g16", "h16_out"],
         verbose=False
     )
@@ -159,7 +160,10 @@ if do_export_flag["encode_value"]:
 
 print("===================================")
 print("model: decoder")
-model_segment = Segment(Btrack.tracker.network.decoder, Btrack.tracker.network.value_dim).eval().cpu()
+model_segment = Segment(
+    Btrack.tracker.network.decoder,
+    Btrack.tracker.network.value_dim
+    ).eval().cpu()
 
 if do_export_flag["decode"]:
     print("\nexport\n")
@@ -178,7 +182,7 @@ if do_export_flag["decode"]:
         dummy_inputs,
         f"./export/XMem-decode-m{mask_num}.onnx",
         export_params=True,
-        opset_version=11,
+        opset_version=17,
         do_constant_folding=False,
         input_names= ["f16","f8","f4", "h16_in", "memory_readout", "h_out"],
         output_names=["h16_out", "logits", "prob"],

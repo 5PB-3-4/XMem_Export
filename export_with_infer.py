@@ -124,18 +124,15 @@ for i in range(try_count):
 
         if first_frame:
             mask, prob, painted_frame = Btrack.track(frame, best_mask)
-            # mask2, prob2, painted_frame2 = Btrack2.track(frame, best_mask)
             first_frame = False
         else:
             mask, prob, painted_frame = Btrack.track(frame)
-            # mask2, prob2, painted_frame2 = Btrack2.track(frame)
         
         best_mask = cv2.normalize(src=mask, dst=None, alpha=1.0, beta=0.0, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
         best_mask = cv2.convertScaleAbs(best_mask, dst=None, alpha=255.0, beta=0.0)
 
         cvtImg = np.hstack((frame, cv2.cvtColor(best_mask, cv2.COLOR_GRAY2BGR)))
         cv2.imshow("result", cv2.resize(cvtImg, dsize=None, fx=0.5, fy=0.5))
-        # cv2.imwrite("./sample/mask"+str(i)+".jpg", best_mask)
         cv2.waitKey(1)
     except KeyboardInterrupt:
         break
@@ -155,7 +152,7 @@ key, shrinkage, selection, f16, f8, f4 = Btrack.tracker.export_val_enc_key
 memory_readout, hidden_1, logits, prob = Btrack.tracker.export_val_dec
 value, hidden_2, all_labels = Btrack.tracker.export_val_enc_val
 
-do_export_flag = { "encode_key": False, "encode_value": False, "decode": False }
+do_export_flag = { "encode_key": True, "encode_value": True, "decode": True }
 for k, v in do_export_flag.items():
     print("{}:  {}".format(k, v))
 
@@ -166,7 +163,7 @@ print("model: key encoder + key projection")
 model_encode_key = EncodeKey(
     Btrack.tracker.network.key_encoder,
     Btrack.tracker.network.key_proj
-).eval().cpu()
+    ).eval().cpu()
 
 if do_export_flag["encode_key"]:
     print("\nexport\n")
@@ -204,6 +201,7 @@ if do_export_flag["encode_value"]:
         torch.randn_like(f16),
         torch.randn_like(hidden_2),
         torch.randn_like(prob[0, 1:].unsqueeze(0)),
+        torch.randn_like(prob[0, 1:].unsqueeze(0)),
         torch.randn((1))
     )
 
@@ -214,7 +212,7 @@ if do_export_flag["encode_value"]:
         export_params=True,
         opset_version=17,
         do_constant_folding=True,
-        input_names= ["image","f16", "h16_in", "masks", "is_deep_update"],
+        input_names= ["image","f16", "h16_in", "masks", "others", "is_deep_update"],
         output_names=["g16", "h16_out"],
         verbose=False
     )
@@ -224,7 +222,10 @@ if do_export_flag["encode_value"]:
 
 print("===================================")
 print("model: decoder")
-model_segment = Segment(Btrack.tracker.network.decoder, Btrack.tracker.network.value_dim).eval().cpu()
+model_segment = Segment(
+    Btrack.tracker.network.decoder,
+    Btrack.tracker.network.value_dim
+    ).eval().cpu()
 
 if do_export_flag["decode"]:
     print("\nexport\n")

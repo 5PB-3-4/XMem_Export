@@ -12,12 +12,11 @@ This repository converts the XMem tracker model included in [Track-Anything](htt
 |name|version|
 |----|-------|
 |os|windows 10|
-|python|3.10.14|
-|uv|0.3.4|
+|cuda|11.8|
+|python|3.10.15|
+|uv|0.4.20|
 |torch|2.3.1|
 |torchvision|0.18.1|
-|numpy|1.26.4|
-|opencv|4.10.0.84|
 
 sample mask file: ```test-sample1-1frame-mask.png``` is made by [EfficientSAM](https://github.com/opencv/opencv_zoo/tree/main/models/image_segmentation_efficientsam)
 

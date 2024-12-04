@@ -7,7 +7,7 @@ from export_model import *
 
 parser = argparse.ArgumentParser(description='welcome to Xmem exporter v0.5')
 parser.add_argument('-i', '--input_dir', required=True, help='Xmem checkpoint file path')
-parser.add_argument('-o', '--output_dir', required=False, default='./export/', help='export folder path. default is [ export/ ]')
+# parser.add_argument('-o', '--output_dir', required=False, default='./export/', help='export folder path. default is [ export/ ]')
 args = parser.parse_args()
 print()
 

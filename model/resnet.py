@@ -13,8 +13,9 @@ from torch.utils import model_zoo
 # if failed by ssl, uncomment this
 # import ssl
 # ssl._create_default_https_context = ssl._create_unverified_context
-# %user%/.cache\torch\hub\checkpoints\resnet18-5c106cde.pth
 
+# On windows, "resnet*.pth" file are downloaded here. 
+# %userprofile%/.cache/torch/hub/checkpoints/
 
 def load_weights_add_extra_dim(target, source_state, extra_dim=1):
 	new_dict = OrderedDict()

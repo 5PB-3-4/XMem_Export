@@ -39,7 +39,8 @@ Check out [requirement.txt](https://github.com/5PB-3-4/XMem_Export/blob/main/req
 ### Download XMem Checkpoint File
 Original pretrained model is [here](https://github.com/hkchengrex/XMem/releases/tag/v1.0).
 
-> Tested XMem-s012.pth, XMem-with-mose.pth
+> Tested XMem-s012.pth, XMem-with-mose.pth, XMem-no-sensory.pth
+
 
 <br>
 
@@ -47,10 +48,10 @@ Original pretrained model is [here](https://github.com/hkchengrex/XMem/releases/
 ```shell
 # Run
 cd XMem_Export
-python export.py -i ./ckpt/XMem-s012.pth --width 640 --height 480 --mask_num 1
+python exporter.py -i ./ckpt/XMem-s012.pth
 
 # Parser option
-python export.py -h
+python exporter.py -h
 ```
 
 <br><br>

@@ -2,7 +2,7 @@
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+
 
 class BasicConv(nn.Module):
     def __init__(self, in_planes, out_planes, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True):
@@ -34,10 +34,12 @@ class ChannelGate(nn.Module):
         channel_att_raw = torch.zeros_like(x)
         for pool_type in self.pool_types:
             if pool_type=='avg':
-                avg_pool = F.avg_pool2d( x, (x.size(2), x.size(3)), stride=(x.size(2), x.size(3)))
+                # avg_pool = F.avg_pool2d( x, (x.size(2), x.size(3)), stride=(x.size(2), x.size(3)))
+                avg_pool = torch.mean(x, dim=(2, 3), keepdim=True)
                 channel_att_raw = self.mlp( avg_pool )
             elif pool_type=='max':
-                max_pool = F.max_pool2d( x, (x.size(2), x.size(3)), stride=(x.size(2), x.size(3)))
+                # max_pool = F.max_pool2d( x, (x.size(2), x.size(3)), stride=(x.size(2), x.size(3)))
+                max_pool = self.max2(x, axis=(2, 3), keepdim=True)
                 channel_att_raw = self.mlp( max_pool )
 
             if channel_att_sum is None:
@@ -47,6 +49,20 @@ class ChannelGate(nn.Module):
 
         scale = torch.sigmoid( channel_att_sum ).unsqueeze(2).unsqueeze(3).expand_as(x)
         return x * scale
+
+    def max2(self, x, axis=None, keepdim=False):
+        if axis is None:
+            axis = range(x.ndim)
+        elif isinstance(axis, int):
+            axis = [axis]
+        else:
+            axis = sorted(axis)
+
+        for ax in axis[::-1]:
+            x = x.max(dim=ax, keepdim=keepdim)[0]
+
+        return x
+
 
 class ChannelPool(nn.Module):
     def forward(self, x):

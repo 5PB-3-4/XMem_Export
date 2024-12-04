@@ -27,7 +27,7 @@ sample mask file: ```test-sample1-1frame-mask.png``` is made by [EfficientSAM](h
 ## ▼ Get Started
 ### Get Code
 ```shell
-git clone https://github.com/5PB-3-4/XMem_Export.git
+git clone https://github.com/5PB-3-4/XMem_Export.git -b nightly
 ```
 <br>
 

@@ -33,7 +33,8 @@ class EncodeValue(nn.Module):
     def __init__(self, encoder: ValueEncoder) -> None:
         super().__init__()
         self.enc = encoder
-        self.is_hidden_dim = torch.tensor([encoder.hidden_reinforce is not None]).type(torch.bool)
+        # self.is_hidden_dim = torch.tensor([encoder.hidden_reinforce is not None]).type(torch.bool)
+        self.is_hidden_dim = encoder.hidden_reinforce is not None
 
     def forward(self, image, image_feat_f16, h, masks, others, is_deep_update:torch.Tensor):
         # image_feat_f16 is the feature from the key encoder
@@ -60,13 +61,13 @@ class EncodeValue(nn.Module):
         g = g.view(batch_size, num_objects, *g.shape[1:])
         g = self.enc.fuser(image_feat_f16, g)
 
-        # if self.is_hidden_reinforce[0] and is_deep_update[0]==1:
-        #     h = self.enc.hidden_reinforce(g, h)
-        h = torch.where(
-            torch.logical_and(self.is_hidden_dim, is_deep_update==torch.ones(1)),
-            self.enc.hidden_reinforce(g, h),
-            h
-        )
+        if self.is_hidden_dim and is_deep_update[0]==1:
+            h = self.enc.hidden_reinforce(g, h)
+        # h = torch.where(
+        #     torch.logical_and(self.is_hidden_dim, is_deep_update==torch.ones(1)),
+        #     self.enc.hidden_reinforce(g, h),
+        #     h
+        # )
 
         return g, h
 
@@ -76,34 +77,35 @@ class Segment(nn.Module):
         super().__init__()
         self.dec = decoder
         self.fuser = FeatureFusionBlock(1024, val_dim, 512, 512)
-        self.is_hidden_dim = torch.tensor([decoder.hidden_update is not None]).type(torch.bool)
+        # self.is_hidden_dim = torch.tensor([decoder.hidden_update is not None]).type(torch.bool)
+        self.is_hidden_dim = decoder.hidden_update is not None
 
     def forward(self, f16, f8, f4, hidden_state, memory_readout, h_out: torch.Tensor):
         batch_size, num_objects = memory_readout.shape[:2]
         g16 = torch.zeros_like(f16)
         
-        # if is_hidden[0]==1:
-        #     g16 = self.dec.fuser(f16, torch.cat([memory_readout, hidden_state], 2))
-        # else:
-        #     g16 = self.fuser(f16, memory_readout)
-        g16 = torch.where(
-            self.is_hidden_dim,
-            self.dec.fuser(f16, torch.cat([memory_readout, hidden_state], 2)),
-            self.fuser(f16, memory_readout)
-            )
+        if self.is_hidden_dim:
+            g16 = self.dec.fuser(f16, torch.cat([memory_readout, hidden_state], 2))
+        else:
+            g16 = self.fuser(f16, memory_readout)
+        # g16 = torch.where(
+        #     self.is_hidden_dim,
+        #     self.dec.fuser(f16, torch.cat([memory_readout, hidden_state], 2)),
+        #     self.fuser(f16, memory_readout)
+        #     )
 
         g8 = self.dec.up_16_8(f8, g16)
         g4 = self.dec.up_8_4(f4, g8)
         logits = self.dec.pred(F.relu(g4.flatten(start_dim=0, end_dim=1)))
 
-        # if h_out[0]==1 and self.is_hidden_updata:
-        #     g4 = torch.cat([g4, logits.view(batch_size, num_objects, 1, *logits.shape[-2:])], 2)
-        #     hidden_state = self.dec.hidden_update([g16, g8, g4], hidden_state)
-        hidden_state = torch.where(
-            torch.logical_and( self.is_hidden_dim, h_out==torch.ones(1) ),
-            self.update(hidden_state, g16, g8, g4, logits, batch_size, num_objects),
-            hidden_state
-        )
+        if h_out[0]==1 and self.is_hidden_dim:
+            g4 = torch.cat([g4, logits.view(batch_size, num_objects, 1, *logits.shape[-2:])], 2)
+            hidden_state = self.dec.hidden_update([g16, g8, g4], hidden_state)
+        # hidden_state = torch.where(
+        #     torch.logical_and( self.is_hidden_dim, h_out==torch.ones(1) ),
+        #     self.update(hidden_state, g16, g8, g4, logits, batch_size, num_objects),
+        #     hidden_state
+        # )
 
         logits = F.interpolate(logits, scale_factor=4, mode='bilinear', align_corners=False)
         logits = logits.view(batch_size, num_objects, *logits.shape[-2:])
